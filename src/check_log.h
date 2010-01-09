@@ -4,17 +4,18 @@
 #include <string>
 
 // The CHECK_xxxx facilities, which generates a segmentation fault
-// when a check is failed.  If the program is run within a debugger,
-// the segmentation fault makes the debugger keeps track of the stack,
-// which provides the context of the fail.
-//
-extern char* kSegmentFaultCauser;
+// when a check is failed.  If users has set
+//     ulimit -u unlimited
+// the segmentation fault will cause a core dump, which can later be
+// used to print the stack trace using a debugger.
+void GenerateSegmentationFault();
+
 
 #define CHECK(a) if (!(a)) {                                            \
     std::cerr << "CHECK failed "                                        \
               << __FILE__ << ":" << __LINE__ << "\n"                    \
               << #a << " = " << (a) << "\n";                            \
-    *((char*)((unsigned long)kSegmentFaultCauser << 5)) = '\0';                \
+    GenerateSegmentationFault();					\
   }                                                                     \
 
 #define CHECK_EQ(a, b) if (!((a) == (b))) {                             \
@@ -22,7 +23,7 @@ extern char* kSegmentFaultCauser;
               << __FILE__ << ":" << __LINE__ << "\n"                    \
               << #a << " = " << (a) << "\n"                             \
               << #b << " = " << (b) << "\n";                            \
-    *((char*)((unsigned long)kSegmentFaultCauser << 5)) = '\0';                \
+    GenerateSegmentationFault();					\
   }                                                                     \
 
 #define CHECK_GT(a, b) if (!((a) > (b))) {                              \
@@ -30,7 +31,7 @@ extern char* kSegmentFaultCauser;
               << __FILE__ << ":" << __LINE__ << "\n"                    \
               << #a << " = " << (a) << "\n"                             \
               << #b << " = " << (b) << "\n";                            \
-    *((char*)((unsigned long)kSegmentFaultCauser << 5)) = '\0';                \
+    GenerateSegmentationFault();					\
   }                                                                     \
 
 #define CHECK_LT(a, b) if (!((a) < (b))) {                              \
@@ -38,7 +39,7 @@ extern char* kSegmentFaultCauser;
               << __FILE__ << ":" << __LINE__ << "\n"                    \
               << #a << " = " << (a) << "\n"                             \
               << #b << " = " << (b) << "\n";                            \
-    *((char*)((unsigned long)kSegmentFaultCauser << 5)) = '\0';                \
+    GenerateSegmentationFault();					\
   }                                                                     \
 
 #define CHECK_GE(a, b) if (!((a) >= (b))) {                             \
@@ -46,7 +47,7 @@ extern char* kSegmentFaultCauser;
               << __FILE__ << ":" << __LINE__ << "\n"                    \
               << #a << " = " << (a) << "\n"                             \
               << #b << " = " << (b) << "\n";                            \
-    *((char*)((unsigned long)kSegmentFaultCauser << 5)) = '\0';                \
+    GenerateSegmentationFault();					\
   }                                                                     \
 
 #define CHECK_LE(a, b) if (!((a) <= (b))) {                             \
@@ -54,15 +55,13 @@ extern char* kSegmentFaultCauser;
               << __FILE__ << ":" << __LINE__ << "\n"                    \
               << #a << " = " << (a) << "\n"                             \
               << #b << " = " << (b) << "\n";                            \
-    *((char*)((unsigned long)kSegmentFaultCauser << 5)) = '\0';                \
+    GenerateSegmentationFault();					\
   }                                                                     \
-                                                                        \
-                                                                        \
-                                                                        \
-  // The log facility, which makes it easy to leave of trace of your
-// program.  The logs are classified according to their severity
-// levels.  Logs of the level FATAL will cause a segmentation fault,
-// which makes the debugger to keep track of the stack.
+
+// The log facility, which makes it easy to leave of trace of your
+// program.  Log operations are classified by their severity levels.
+// Logs of the level FATAL will cause a segmentation fault, which
+// in turn leaves the chance to trace stack using a debugger.
 //
 // Examples:
 //   LOG(INFO) << iteration << "-th iteration ...";
@@ -80,7 +79,7 @@ class Logger {
   }
   ~Logger() {
     if (ls_ == FATAL) {
-      *::kSegmentFaultCauser = '\0';
+      GenerateSegmentationFault();
     }
   }
  private:

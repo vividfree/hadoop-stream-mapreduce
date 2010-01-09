@@ -2,4 +2,8 @@
 
 #include "check_log.h"
 
-char* kSegmentFaultCauser = "Used to cause artificial segmentation fault";
+void GenerateSegmentationFault() {
+  static char* kSegmentFaultCauser = "Used to cause segmentation fault";
+  *(char*)((unsigned long)kSegmentFaultCauser << 5) = '\0';
+}
+
