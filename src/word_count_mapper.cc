@@ -28,7 +28,7 @@ class WordCountMapper : public Mapper {
   }
 };
 
-int main(int argc, char* argv) {
+int main(int argc, char** argv) {
   WordCountMapper mapper;
   MapWorker(&cin, &mapper);
   return 0;

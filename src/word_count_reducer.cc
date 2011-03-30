@@ -26,7 +26,7 @@ class WordCountReducer : public Reducer {
   }
 };
 
-int main(int argc, char* argv) {
+int main(int argc, char** argv) {
   WordCountReducer reducer;
   ReduceWorker(&cin, &reducer);
   return 0;
