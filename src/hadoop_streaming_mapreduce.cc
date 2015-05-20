@@ -92,7 +92,7 @@ void ReduceInputIterator::Next() {
 }
 
 void ReduceInputIterator::DiscardRemainingValues() {
-  while (state_ != FINISHED_AN_INPUT) {
+  while (state_ != FINISHED_AN_INPUT && state_ != END_OF_SHARD) {
     Next();
   }
 }
